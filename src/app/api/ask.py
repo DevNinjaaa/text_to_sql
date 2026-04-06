@@ -1,4 +1,5 @@
 import json
+import os
 import yaml
 import chromadb
 from fastapi import APIRouter
@@ -20,8 +21,22 @@ with open(QUERIES_PATH, "r") as f:
 
 router = APIRouter(prefix="", tags=["Items"])
 
-# Initialize Models and DB
-model = SentenceTransformer(config["MODEL_PATH"])
+model_name = 'sentence-transformers/all-MiniLM-L6-v2'
+custom_path = "LLMmodels"
+
+model_path = config["MODEL_PATH"]
+
+if os.path.exists(model_path):
+    # Load directly from your specific local folder
+    model = SentenceTransformer(model_path)
+    print(f"Loaded model locally from {model_path}")
+else:
+    # If the path doesn't exist yet, download it to that path
+    print("Local model path not found. Downloading...")
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    # Save it specifically to your path for next time
+    model.save(model_path)
+
 client = chromadb.PersistentClient(path=config["CHROMA_PATH"]) # type: ignore
 collection = client.get_or_create_collection(name="sql_templates")
 CONFIDENCE_THRESHOLD = config["CONFIDENCE_THRESHOLD"]
