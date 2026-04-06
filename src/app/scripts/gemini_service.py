@@ -1,16 +1,17 @@
+import os
 from google import genai
 from google.genai import types
 import json
 import yaml
-
+from dotenv import load_dotenv
 # Loading config for API Key and Model Name
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+load_dotenv()
+
 
 class GeminiReasoningService:
     def __init__(self):
         # Initialize the modern client
-        self.client = genai.Client(api_key=config["GEMINI_API_KEY"])
+        self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         self.model_id = "gemini-3-flash-preview"
         
         # This defines the "Brain" of The fallback logic

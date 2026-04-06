@@ -1,22 +1,24 @@
 [project]
-name = "text to sql"
+name = "text-to-sql"
 version = "0.1.0"
 description = "FastAPI + NLP + ChromaDB project"
-authors = [
-    {name = "Eslam Samir", email = "eslamsamir608@gmail.com"}
-]
+authors = []
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.111.1",
-    "pydantic>=2.5.2",
-    "uvicorn>=0.25.0",
-    "sentence-transformers>=2.2.2",
-    "chromadb>=0.4.4",
-    "spacy>=3.7.0",
-    "thefuzz>=0.20.0",
-    "pyyaml>=7.0.1",
-    "google"
+    "fastapi",
+    "pydantic",
+    "uvicorn",
+    "sentence-transformers",
+    "chromadb",
+    "spacy",
+    "thefuzz",
+    "pyyaml",
+    "google-genai",
+    "python-dotenv"
 ]
+
+[tool.poetry]
+packages = [{include = "src"}]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -1,10 +1,13 @@
 import json
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
-# Use absolute import to match your project structure
 from src.app.core.dp import collection
+import os
 
-def seed_database(model: SentenceTransformer, queries_path: str = "data/queries.json"):
+q_path = os.path.join("data","queries.json")
+
+
+def seed_database(model: SentenceTransformer, queries_path: str = q_path):
     """
     Seed ChromaDB collection from a JSON file.
     
@@ -47,19 +50,14 @@ def seed_database(model: SentenceTransformer, queries_path: str = "data/queries.
         if uid in existing_ids:
             continue
 
-        # --- FIX: Prepare Metadata ---
-        # ChromaDB metadata values must be str, int, float, or bool. 
-        # It does NOT allow lists or None.
+
         entry_metadata = {
             "sql": sql_template
         }
 
-        # Only add 'required' if the list has items, and convert it to a string
         if required_list:
             entry_metadata["required"] = ", ".join(required_list)
-        # -----------------------------
 
-        # Compute embedding
         embedding = model.encode(description).tolist()
 
         ids_to_add.append(uid)

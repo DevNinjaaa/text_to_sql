@@ -1,0 +1,312 @@
+[
+    {
+        "id": 1,
+        "query": "SELECT * FROM Employees",
+        "required": [],
+        "user_text": "Show me all employees"
+    },
+    {
+        "id": 2,
+        "query": "SELECT * FROM Employees WHERE Email = {email}",
+        "required": [
+            "email"
+        ],
+        "user_text": "Find the employee with email {email}"
+    },
+    {
+        "id": 3,
+        "query": "SELECT * FROM Employees WHERE DepartmentID = {departmentId}",
+        "required": [
+            "departmentId"
+        ],
+        "user_text": "List all employees in department {departmentId}"
+    },
+    {
+        "id": 4,
+        "query": "SELECT * FROM Employees WHERE ManagerID = {managerId}",
+        "required": [
+            "managerId"
+        ],
+        "user_text": "Who reports to manager {managerId}?"
+    },
+    {
+        "id": 5,
+        "query": "SELECT * FROM Employees WHERE JobTitle = {jobTitle}",
+        "required": [
+            "jobTitle"
+        ],
+        "user_text": "Show me everyone with the job title {jobTitle}"
+    },
+    {
+        "id": 6,
+        "query": "SELECT * FROM Employees WHERE Gender = {gender}",
+        "required": [
+            "gender"
+        ],
+        "user_text": "Filter employees by gender {gender}"
+    },
+    {
+        "id": 7,
+        "query": "SELECT * FROM Departments",
+        "required": [],
+        "user_text": "Get a list of all departments"
+    },
+    {
+        "id": 8,
+        "query": "SELECT * FROM Departments WHERE ManagerID = {managerId}",
+        "required": [
+            "managerId"
+        ],
+        "user_text": "Which department is managed by {managerId}?"
+    },
+    {
+        "id": 9,
+        "query": "SELECT * FROM Tasks",
+        "required": [],
+        "user_text": "Show all tasks"
+    },
+    {
+        "id": 10,
+        "query": "SELECT * FROM Tasks WHERE EmployeeID = {employeeId}",
+        "required": [
+            "employeeId"
+        ],
+        "user_text": "What tasks are assigned to employee {employeeId}?"
+    },
+    {
+        "id": 11,
+        "query": "SELECT * FROM Tasks WHERE ManagerID = {managerId}",
+        "required": [
+            "managerId"
+        ],
+        "user_text": "List tasks overseen by manager {managerId}"
+    },
+    {
+        "id": 12,
+        "query": "SELECT * FROM Tasks WHERE Status = {status}",
+        "required": [
+            "status"
+        ],
+        "user_text": "Show me all {status} tasks"
+    },
+    {
+        "id": 13,
+        "query": "SELECT * FROM Tasks WHERE EmployeeID = {employeeId} AND Status = {status}",
+        "required": [
+            "employeeId",
+            "status"
+        ],
+        "user_text": "Find {status} tasks for employee {employeeId}"
+    },
+    {
+        "id": 14,
+        "query": "SELECT * FROM SelfServices",
+        "required": [],
+        "user_text": "View all self-service requests"
+    },
+    {
+        "id": 15,
+        "query": "SELECT * FROM SelfServices WHERE EmployeeID = {employeeId}",
+        "required": [
+            "employeeId"
+        ],
+        "user_text": "Show self-service requests for employee {employeeId}"
+    },
+    {
+        "id": 16,
+        "query": "SELECT * FROM SelfServices WHERE RequestType = {requestType}",
+        "required": [
+            "requestType"
+        ],
+        "user_text": "List all {requestType} requests"
+    },
+    {
+        "id": 17,
+        "query": "SELECT * FROM SelfServices WHERE Status = {status}",
+        "required": [
+            "status"
+        ],
+        "user_text": "Show self-service requests with status {status}"
+    },
+    {
+        "id": 18,
+        "query": "SELECT * FROM SelfServices WHERE EmployeeID = {employeeId} AND Status = {status}",
+        "required": [
+            "employeeId",
+            "status"
+        ],
+        "user_text": "Get the {status} requests for {employeeId}"
+    },
+    {
+        "id": 19,
+        "query": "SELECT * FROM JobVacancies",
+        "required": [],
+        "user_text": "What are the current job vacancies?"
+    },
+    {
+        "id": 20,
+        "query": "SELECT * FROM JobVacancies WHERE DepartmentID = {departmentId}",
+        "required": [
+            "departmentId"
+        ],
+        "user_text": "Show job openings in department {departmentId}"
+    },
+    {
+        "id": 21,
+        "query": "SELECT * FROM JobVacancies WHERE Status = {status}",
+        "required": [
+            "status"
+        ],
+        "user_text": "List all {status} job vacancies"
+    },
+    {
+        "id": 22,
+        "query": "SELECT * FROM JobVacancies WHERE DepartmentID = {departmentId} AND Status = {status}",
+        "required": [
+            "departmentId",
+            "status"
+        ],
+        "user_text": "Find {status} vacancies in department {departmentId}"
+    },
+    {
+        "id": 23,
+        "query": "SELECT * FROM JobApplications",
+        "required": [],
+        "user_text": "Show all job applications"
+    },
+    {
+        "id": 24,
+        "query": "SELECT * FROM JobApplications WHERE JobID = {jobId}",
+        "required": [
+            "jobId"
+        ],
+        "user_text": "Who applied for job {jobId}?"
+    },
+    {
+        "id": 25,
+        "query": "SELECT * FROM JobApplications WHERE ApplicantID = {applicantId}",
+        "required": [
+            "applicantId"
+        ],
+        "user_text": "Show applications from applicant {applicantId}"
+    },
+    {
+        "id": 26,
+        "query": "SELECT * FROM JobApplications WHERE Status = {status}",
+        "required": [
+            "status"
+        ],
+        "user_text": "List applications that are {status}"
+    },
+    {
+        "id": 27,
+        "query": "SELECT * FROM JobApplications WHERE JobID = {jobId} AND Status = {status}",
+        "required": [
+            "jobId",
+            "status"
+        ],
+        "user_text": "Show {status} applications for job {jobId}"
+    },
+    {
+        "id": 28,
+        "query": "SELECT * FROM Applicants",
+        "required": [],
+        "user_text": "Get a list of all applicants"
+    },
+    {
+        "id": 29,
+        "query": "SELECT * FROM Applicants WHERE Email = {email}",
+        "required": [
+            "email"
+        ],
+        "user_text": "Find the applicant with email {email}"
+    },
+    {
+        "id": 30,
+        "query": "SELECT * FROM Employees LIMIT {limit}",
+        "required": [
+            "limit"
+        ],
+        "user_text": "Show me just {limit} employees"
+    },
+    {
+        "id": 31,
+        "query": "SELECT COUNT(*) FROM Employees WHERE DepartmentID = {departmentId}",
+        "required": [
+            "departmentId"
+        ],
+        "user_text": "How many employees work in department {departmentId}?"
+    },
+    {
+        "id": 32,
+        "query": "SELECT * FROM Employees WHERE JobTitle LIKE '%{keyword}%'",
+        "required": [
+            "keyword"
+        ],
+        "user_text": "Search for employees with {keyword} in their job title"
+    },
+    {
+        "id": 33,
+        "query": "SELECT DISTINCT JobTitle FROM Employees",
+        "required": [],
+        "user_text": "What are all the unique job titles in the company?"
+    },
+    {
+        "id": 34,
+        "query": "SELECT COUNT(*) FROM Tasks WHERE Status = {status}",
+        "required": [
+            "status"
+        ],
+        "user_text": "Give me the total number of {status} tasks"
+    },
+    {
+        "id": 35,
+        "query": "SELECT * FROM Tasks WHERE EmployeeID = {employeeId} ORDER BY TaskID DESC LIMIT {limit}",
+        "required": [
+            "employeeId",
+            "limit"
+        ],
+        "user_text": "What are the {limit} most recent tasks for employee {employeeId}?"
+    },
+    {
+        "id": 36,
+        "query": "SELECT * FROM JobVacancies ORDER BY id DESC LIMIT {limit}",
+        "required": [
+            "limit"
+        ],
+        "user_text": "Show me the {limit} latest job vacancies"
+    },
+    {
+        "id": 37,
+        "query": "SELECT COUNT(*) FROM JobApplications WHERE JobID = {jobId}",
+        "required": [
+            "jobId"
+        ],
+        "user_text": "How many people applied for job {jobId}?"
+    },
+    {
+        "id": 38,
+        "query": "SELECT * FROM JobApplications WHERE JobID = {jobId} LIMIT {limit}",
+        "required": [
+            "jobId",
+            "limit"
+        ],
+        "user_text": "Show me {limit} applications for the job {jobId}"
+    },
+    {
+        "id": 39,
+        "query": "SELECT * FROM SelfServices WHERE Status = 'Pending' ORDER BY RequestDate ASC LIMIT {limit}",
+        "required": [
+            "limit"
+        ],
+        "user_text": "Show me the {limit} oldest pending self-service requests"
+    },
+    {
+        "id": 40,
+        "query": "SELECT * FROM Applicants WHERE Email LIKE '%{domain}%'",
+        "required": [
+            "domain"
+        ],
+        "user_text": "Find applicants whose email contains {domain}"
+    }
+]
