@@ -3,7 +3,6 @@ from spacy.matcher import Matcher
 
 nlp = spacy.load("en_core_web_sm")
 
-
 patterns = {
     "email": [{"TEXT": {"REGEX": r"[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+"}}],
     "departmentId": [{"IS_DIGIT": True}],
@@ -12,23 +11,31 @@ patterns = {
     "jobId": [{"IS_DIGIT": True}],
     "applicantId": [{"IS_DIGIT": True}],
     "limit": [{"IS_DIGIT": True}],
-    "status": [{"LOWER": {"IN": ["pending", "completed", "open", "closed", "active"]}}],
+    "status": [{"LOWER": {"IN": ["pending", "completed", "open", "closed", "active", "backend"]}}], 
     "gender": [{"LOWER": {"IN": ["male", "female", "other"]}}],
-    "domain": [{"TEXT": {"REGEX": r"@[a-zA-Z0-9-.]+"}}]
+    "domain": [{"TEXT": {"REGEX": r"@[a-zA-Z0-9-.]+"}}],
+    
+    "jobTitle": [{"LOWER": {"IN": ["title", "tittle", "position"]}}, {"IS_ALPHA": True, "OP": "+"}],
+    "keyword": [{"LOWER": {"IN": ["with", "containing", "called"]}}, {"IS_ALPHA": True, "OP": "+"}]
 }
 
 def extract_variables(text, required_fields):
     doc = nlp(text)
     extracted = {}
     
+    matcher = Matcher(nlp.vocab)
     for field in required_fields:
-        # Check if we have a pattern for this field
         if field in patterns:
-            matcher = Matcher(nlp.vocab)
             matcher.add(field, [patterns[field]])
-            matches = matcher(doc)
-            if matches:
-                # Get the first match found
-                span = doc[matches[0][1]:matches[0][2]]
-                extracted[field] = span.text
+    
+    matches = matcher(doc)
+    for match_id, start, end in matches:
+        string_id = nlp.vocab.strings[match_id]
+        span = doc[start:end]
+        
+        if string_id in ["jobTitle", "keyword"]:
+            extracted[string_id] = " ".join([token.text for token in span[1:]])
+        else:
+            extracted[string_id] = span.text
+            
     return extracted
