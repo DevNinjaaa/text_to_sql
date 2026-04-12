@@ -1,88 +1,67 @@
+import os
 import yaml
+import json
 import chromadb
 from fastapi import APIRouter, HTTPException
 from sentence_transformers import SentenceTransformer
 
 # Local Imports
 from src.app.models.feedback_request import FeedbackRequest
-from src.app.scripts.gemini_service import gemini_reasoner 
+from src.app.scripts.gemini_service import gemini_reasoner
+from src.app.scripts.schema import SchemaProvider
+from src.app.utils import update_query_json 
 
-# --- Configuration & Initialization ---
+# --- Configuration ---
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 MODEL_PATH = config["MODEL_PATH"]
 CHROMA_PATH = config["CHROMA_PATH"]
-CONFIDENCE_THRESHOLD = config["CONFIDENCE_THRESHOLD"]
+QUERIES_JSON_PATH = config.get("QUERIES_JSON_PATH", r"data/queries.json")
 
-router = APIRouter(
-    prefix="",       
-    tags=["Items"]         
-)
+router = APIRouter(prefix="/sql", tags=["Feedback & Correction"])
 
-# Load Model and Database
+# Load Vector DB
 model = SentenceTransformer(MODEL_PATH)
-client = chromadb.PersistentClient(path=CHROMA_PATH) # type: ignore
+client = chromadb.PersistentClient(path=CHROMA_PATH)
 collection = client.get_or_create_collection(name="sql_templates")
 
-# --- Routes ---
 @router.post("/feedback")
 async def process_feedback(feedback: FeedbackRequest):
-    
-    # CASE 1: User says "No, this is wrong"
     if not feedback.is_correct:
-        # Trigger Gemini to analyze and FIX the query
-        analysis = gemini_reasoner.analyze_sql_failure(
-            user_text=feedback.user_phrase,
-            matched_template=feedback.matched_sql or "Unknown",
-            extracted_params=feedback.extracted_params or {}
-        )
+        # --- Negative Feedback: AI Fix ---
+        # 1. Get relevant table names from JSON for this template
+        with open(QUERIES_JSON_PATH, "r") as f:
+            data = json.load(f)
+        target = next((item for item in data if str(item["id"]) == str(feedback.template_id)), None)
         
-        return {
-            "status": "ai_correction",
-            "analysis": analysis.get("explanation"),
-            "suggestion": analysis.get("fix_suggestion"),
-            "corrected_sql": analysis.get("corrected_sql"), # <-- Added AI Correction
-            "error_type": analysis.get("error_type")
-        }
+        # 2. Inject ONLY the necessary table schemas into Gemini
+        relevant_tables = target.get("tables", []) if target else []
+        schema_context = SchemaProvider.get_context(relevant_tables)
 
-    # CASE 2: User says "Yes, this is correct" -> System Learns
+        analysis = gemini_reasoner.analyze_user_discrepancy(
+            executed_sql=feedback.matched_sql,
+            table_schema=schema_context,
+            user_intent=feedback.user_phrase,
+            user_feedback=feedback.user_comment
+        )
+        return {"status": "ai_correction", **analysis}
+
     else:
-        # Safety Check 1: Ensure template_id was provided
-        if not feedback.template_id:
-            raise HTTPException(
-                status_code=400, 
-                detail="Cannot process positive feedback without a valid template_id."
-            )
+        # --- Positive Feedback: Learning ---
+        # 1. Immediate retrieval fix in ChromaDB
+        res = collection.get(ids=[feedback.template_id])
+        if res.get("metadatas"):
+            if res["metadatas"]:
+                target_sql = res["metadatas"][0].get("sql")
+                collection.add(
+                    ids=[f"fb_{feedback.template_id}_{abs(hash(feedback.user_phrase))}"],
+                    embeddings=[model.encode(feedback.user_phrase).tolist()],
+                    metadatas=[{"sql": target_sql, "is_feedback": "true"}],
+                    documents=[feedback.user_phrase]
+                )
 
-        # Retrieve original SQL metadata for the template
-        original = collection.get(ids=[feedback.template_id])
+        # 2. Long-term persistence fix in JSON
+        synced = update_query_json(feedback.template_id, feedback.user_phrase)
         
-        # Safety Check 2: Ensure the ID actually exists in Chroma
-        if not original.get("metadatas") or not original["metadatas"][0]:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"Original Template ID '{feedback.template_id}' not found in Chroma."
-            )
-        
-        target_sql = original["metadatas"][0].get("sql")
-        
-        # Safety Check 3: Ensure the target SQL isn't empty
-        if not target_sql:
-            raise HTTPException(
-                status_code=500,
-                detail="Found template, but it is missing the 'sql' metadata field."
-            )
-        
-        # Generate a unique ID for the new database entry
-        new_id = f"fb_{feedback.template_id}_{abs(hash(feedback.user_phrase))}"
-        
-        # Add the new phrasing to the vector database
-        collection.add(
-            ids=[new_id],
-            embeddings=[model.encode(feedback.user_phrase).tolist()],
-            metadatas=[{"sql": target_sql, "is_feedback": "true"}],
-            documents=[feedback.user_phrase]
-        )
-        
-        return {"status": "updated", "message": "System learned from your phrasing!"}
+        return {"status": "success", "learned": True, "persisted": synced}
